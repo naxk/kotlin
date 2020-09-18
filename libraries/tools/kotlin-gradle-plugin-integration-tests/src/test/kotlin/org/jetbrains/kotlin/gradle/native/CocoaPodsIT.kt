@@ -1174,7 +1174,7 @@ class CocoaPodsIT : BaseGradleIT() {
             runCommand(
                 iosAppDir, "xcodebuild",
                 "-sdk", "iphonesimulator",
-                "-arch", "arm64",
+                "-arch", "x86_64",
                 "-configuration", "Release",
                 "-workspace", "${iosAppDir.name}.xcworkspace",
                 "-scheme", iosAppDir.name,
