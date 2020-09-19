@@ -773,7 +773,7 @@ class GeneralNativeIT : BaseGradleIT() {
                 assertTasksUpToDate(hostLibraryTasks)
             }
 
-            build(*hostLibraryTasks.toTypedArray(), "-Porg.jetbrains.kotlin.native.version=1.3.70-dev-13258") {
+            build(*hostLibraryTasks.toTypedArray(), "-Porg.jetbrains.kotlin.native.version=1.4.20-dev-16314") {
                 assertSuccessful()
                 assertTasksExecuted(hostLibraryTasks)
             }
