@@ -2656,6 +2656,11 @@ public class FirDiagnosticsWithLightTreeTestGenerated extends AbstractFirDiagnos
             runTest("compiler/fir/analysis-tests/testData/resolve/visibility/exposedTypeParameters.kt");
         }
 
+        @TestMetadata("intersectionOverrideWithImplicitTypes.kt")
+        public void testIntersectionOverrideWithImplicitTypes() throws Exception {
+            runTest("compiler/fir/analysis-tests/testData/resolve/visibility/intersectionOverrideWithImplicitTypes.kt");
+        }
+
         @TestMetadata("protectedInCompanion.kt")
         public void testProtectedInCompanion() throws Exception {
             runTest("compiler/fir/analysis-tests/testData/resolve/visibility/protectedInCompanion.kt");
