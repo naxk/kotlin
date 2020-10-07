@@ -6,8 +6,7 @@
 package org.jetbrains.kotlin.fir.resolve.transformers
 
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.FirDeclaration
-import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
+import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.resolve.fullyExpandedType
 import org.jetbrains.kotlin.fir.resolve.toSymbol
 import org.jetbrains.kotlin.fir.symbols.AbstractFirBasedSymbol
@@ -37,10 +36,6 @@ fun AbstractFirBasedSymbol<*>.ensureResolvedForCalls(
     val fir = fir as FirDeclaration
     if (fir.resolvePhase >= FirResolvePhase.DECLARATIONS) return
 
-//    val requiredPhase = when (fir) {
-//        is FirFunction<*>, is FirProperty -> FirResolvePhase.CONTRACTS
-//        else -> FirResolvePhase.STATUS
-//    }
 //
 //    if (requiredPhase == FirResolvePhase.CONTRACTS) {
 //        // Workaround for recursive contracts in CLI
@@ -49,7 +44,10 @@ fun AbstractFirBasedSymbol<*>.ensureResolvedForCalls(
 //        if (fir.session.phaseManager == null) return
 //    }
 
-    val requiredPhase = FirResolvePhase.DECLARATIONS
+    val requiredPhase = when (fir) {
+        is FirSimpleFunction, is FirProperty -> FirResolvePhase.TYPES
+        else -> FirResolvePhase.STATUS
+    }
 
     ensureResolved(requiredPhase, useSiteSession)
 }

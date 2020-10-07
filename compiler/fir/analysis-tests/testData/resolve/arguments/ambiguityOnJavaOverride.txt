@@ -4,7 +4,7 @@ FILE: main.kt
             super<R|A|>()
         }
 
-        public final override fun foo(s: R|kotlin/String|): R|kotlin/Any?| {
+        public/*package*/ final override fun foo(s: R|kotlin/String|): R|kotlin/Any?| {
             ^foo Null(null)
         }
 

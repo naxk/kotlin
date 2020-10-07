@@ -15,6 +15,10 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.resolve.ScopeSession
+import org.jetbrains.kotlin.fir.scopes.ProcessorAction
+import org.jetbrains.kotlin.fir.scopes.processOverriddenFunctions
+import org.jetbrains.kotlin.fir.scopes.processOverriddenProperties
+import org.jetbrains.kotlin.fir.scopes.unsubstitutedScope
 import org.jetbrains.kotlin.fir.visitors.CompositeTransformResult
 import org.jetbrains.kotlin.fir.visitors.compose
 import org.jetbrains.kotlin.fir.visitors.transformSingle
@@ -22,17 +26,18 @@ import org.jetbrains.kotlin.fir.visitors.transformSingle
 @OptIn(AdapterForResolveProcessor::class)
 class FirStatusResolveProcessor(session: FirSession, scopeSession: ScopeSession) :
     FirTransformerBasedResolveProcessor(session, scopeSession) {
-    override val transformer = FirStatusResolveTransformer(session)
+    override val transformer = FirStatusResolveTransformer(session, scopeSession)
 }
 
-fun <F : FirClass<F>> F.runStatusResolveForLocalClass(session: FirSession): F {
-    val transformer = FirStatusResolveTransformer(session)
+fun <F : FirClass<F>> F.runStatusResolveForLocalClass(session: FirSession, scopeSession: ScopeSession): F {
+    val transformer = FirStatusResolveTransformer(session, scopeSession)
 
     return this.transform<F, Nothing?>(transformer, null).single
 }
 
 class FirStatusResolveTransformer(
-    override val session: FirSession
+    override val session: FirSession,
+    val scopeSession: ScopeSession
 ) : FirAbstractTreeTransformer<FirDeclarationStatus?>(phase = FirResolvePhase.STATUS) {
     private val classes = mutableListOf<FirClass<*>>()
 
@@ -83,12 +88,12 @@ class FirStatusResolveTransformer(
 
     override fun transformTypeAlias(typeAlias: FirTypeAlias, data: FirDeclarationStatus?): CompositeTransformResult<FirDeclaration> {
         typeAlias.typeParameters.forEach { transformDeclaration(it, data) }
-        typeAlias.transformStatus(this, typeAlias.resolveStatus(typeAlias.status, containingClass, isLocal = false))
+        typeAlias.transformStatus(this, typeAlias.resolveStatus(typeAlias.status, containingClass, isLocal = false, session, scopeSession))
         return transformDeclaration(typeAlias, data)
     }
 
     override fun transformRegularClass(regularClass: FirRegularClass, data: FirDeclarationStatus?): CompositeTransformResult<FirStatement> {
-        regularClass.transformStatus(this, regularClass.resolveStatus(regularClass.status, containingClass, isLocal = false))
+        regularClass.transformStatus(this, regularClass.resolveStatus(regularClass.status, containingClass, isLocal = false, session, scopeSession))
         @Suppress("UNCHECKED_CAST")
         return storeClass(regularClass) {
             regularClass.typeParameters.forEach { it.transformSingle(this, data) }
@@ -110,7 +115,7 @@ class FirStatusResolveTransformer(
         propertyAccessor: FirPropertyAccessor,
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirDeclaration> {
-        propertyAccessor.transformStatus(this, propertyAccessor.resolveStatus(propertyAccessor.status, containingClass, isLocal = false))
+        propertyAccessor.transformStatus(this, propertyAccessor.resolveStatus(propertyAccessor.status, containingClass, isLocal = false, session, scopeSession))
         @Suppress("UNCHECKED_CAST")
         return transformDeclaration(propertyAccessor, data)
     }
@@ -119,7 +124,7 @@ class FirStatusResolveTransformer(
         constructor: FirConstructor,
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirDeclaration> {
-        constructor.transformStatus(this, constructor.resolveStatus(constructor.status, containingClass, isLocal = false))
+        constructor.transformStatus(this, constructor.resolveStatus(constructor.status, containingClass, isLocal = false, session, scopeSession))
         return transformDeclaration(constructor, data)
     }
 
@@ -127,7 +132,7 @@ class FirStatusResolveTransformer(
         simpleFunction: FirSimpleFunction,
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirDeclaration> {
-        simpleFunction.transformStatus(this, simpleFunction.resolveStatus(simpleFunction.status, containingClass, isLocal = false))
+        simpleFunction.transformStatus(this, simpleFunction.resolveStatus(simpleFunction.status, containingClass, isLocal = false, session, scopeSession))
         return transformDeclaration(simpleFunction, data)
     }
 
@@ -135,7 +140,7 @@ class FirStatusResolveTransformer(
         property: FirProperty,
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirDeclaration> {
-        property.transformStatus(this, property.resolveStatus(property.status, containingClass, isLocal = false))
+        property.transformStatus(this, property.resolveStatus(property.status, containingClass, isLocal = false, session, scopeSession))
         return transformDeclaration(property, data)
     }
 
@@ -143,7 +148,7 @@ class FirStatusResolveTransformer(
         field: FirField,
         data: FirDeclarationStatus?
     ): CompositeTransformResult<FirDeclaration> {
-        field.transformStatus(this, field.resolveStatus(field.status, containingClass, isLocal = false))
+        field.transformStatus(this, field.resolveStatus(field.status, containingClass, isLocal = false, session, scopeSession))
         return transformDeclaration(field, data)
     }
 
@@ -181,14 +186,16 @@ private val <F : FirClass<F>> FirClass<F>.modality: Modality?
 fun FirDeclaration.resolveStatus(
     status: FirDeclarationStatus,
     containingClass: FirClass<*>?,
-    isLocal: Boolean
+    isLocal: Boolean,
+    session: FirSession,
+    scopeSession: ScopeSession,
 ): FirDeclarationStatus {
     if (status.visibility == Visibilities.Unknown || status.modality == null || status.modality == Modality.OPEN) {
         val visibility = when (status.visibility) {
             Visibilities.Unknown -> when {
                 isLocal -> Visibilities.Local
                 this is FirConstructor && containingClass is FirAnonymousObject -> Visibilities.Private
-                else -> resolveVisibility(containingClass)
+                else -> resolveVisibility(containingClass, session, scopeSession)
             }
             else -> status.visibility
         }
@@ -212,7 +219,11 @@ private fun FirDeclaration.hasOwnBodyOrAccessorBody(): Boolean {
     }
 }
 
-private fun FirDeclaration.resolveVisibility(containingClass: FirClass<*>?): Visibility {
+private fun FirDeclaration.resolveVisibility(
+    containingClass: FirClass<*>?,
+    session: FirSession,
+    scopeSession: ScopeSession,
+): Visibility {
     // See DescriptorUtils#getDefaultConstructorVisibility in core.descriptors
     if (this is FirConstructor) {
         if (containingClass != null &&
@@ -222,7 +233,56 @@ private fun FirDeclaration.resolveVisibility(containingClass: FirClass<*>?): Vis
             return Visibilities.Private
         }
     }
-    return Visibilities.Public // TODO (overrides)
+    if (containingClass != null && this is FirCallableMemberDeclaration<*> && this.isOverride) {
+        val scope = containingClass.unsubstitutedScope(session, scopeSession)
+        var overriddenVisibility: Visibility? = null
+
+        fun processOverridden(overridden: FirCallableMemberDeclaration<*>): Boolean {
+            val visibility = overridden.visibility
+            return when {
+                visibility != Visibilities.Unknown -> {
+                    overriddenVisibility = visibility
+                    true
+                }
+                !overridden.isOverride -> {
+                    overriddenVisibility = Visibilities.Public
+                    true
+                }
+                else -> {
+                    false
+                }
+            }
+        }
+
+        when (this) {
+            is FirSimpleFunction -> {
+                val name = this.name
+                scope.processFunctionsByName(name) {}
+                scope.processOverriddenFunctions(symbol) {
+                    val overridden = it.fir
+                    if (overridden is FirSimpleFunction && processOverridden(overridden)) {
+                        ProcessorAction.STOP
+                    } else {
+                        ProcessorAction.NEXT
+                    }
+                }
+            }
+            is FirProperty -> {
+                val name = this.name
+                scope.processPropertiesByName(name) {}
+                scope.processOverriddenProperties(symbol) {
+                    val overridden = it.fir
+                    if (processOverridden(overridden)) {
+                        ProcessorAction.STOP
+                    } else {
+                        ProcessorAction.NEXT
+                    }
+                }
+            }
+        }
+        overriddenVisibility?.let { return it }
+    }
+    return Visibilities.Public
 }
 
 private fun FirDeclaration.resolveModality(containingClass: FirClass<*>?): Modality {
