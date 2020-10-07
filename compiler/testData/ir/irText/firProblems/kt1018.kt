@@ -1,3 +1,4 @@
+// FIR_IDENTICAL
 public class StockMarketTableModel() {
 
     public fun getColumnCount() : Int {
