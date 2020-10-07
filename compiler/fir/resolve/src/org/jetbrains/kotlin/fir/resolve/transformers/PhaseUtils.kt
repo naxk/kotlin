@@ -25,7 +25,7 @@ fun AbstractFirBasedSymbol<*>.ensureResolved(
     val availablePhase = fir.resolvePhase
     if (availablePhase >= requiredPhase) return
     val resolver = fir.session.phaseManager
-        ?: error("phaseManager should be defined when working with FIR in phased mode")
+        ?: error("phaseManager should be defined when working with FIR in phased mode; available = $availablePhase, required = $requiredPhase")
 
     resolver.ensureResolved(this, requiredPhase)
 }
