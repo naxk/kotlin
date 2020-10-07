@@ -10193,6 +10193,24 @@ public class IrJsCodegenBoxES6TestGenerated extends AbstractIrJsCodegenBoxES6Tes
         }
     }
 
+    @TestMetadata("compiler/testData/codegen/box/firProblems")
+    @TestDataPath("$PROJECT_ROOT")
+    @RunWith(JUnit3RunnerWithInners.class)
+    public static class FirProblems extends AbstractIrJsCodegenBoxES6Test {
+        private void runTest(String testDataFilePath) throws Exception {
+            KotlinTestUtils.runTest0(this::doTest, TargetBackend.JS_IR_ES6, testDataFilePath);
+        }
+
+        public void testAllFilesPresentInFirProblems() throws Exception {
+            KotlinTestUtils.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("compiler/testData/codegen/box/firProblems"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JS_IR_ES6, true);
+        }
+
+        @TestMetadata("RecursiveInline.kt")
+        public void testRecursiveInline() throws Exception {
+            runTest("compiler/testData/codegen/box/firProblems/RecursiveInline.kt");
+        }
+    }
+
     @TestMetadata("compiler/testData/codegen/box/fullJdk")
     @TestDataPath("$PROJECT_ROOT")
     @RunWith(JUnit3RunnerWithInners.class)

@@ -1,0 +1,72 @@
+FILE fqName:<root> fileName:/RecursiveInline.kt
+  FUN name:copyValueIfNeeded visibility:public modality:FINAL <> ($receiver:kotlin.Any) returnType:kotlin.Any
+    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Any
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='public final fun copyValueIfNeeded (): kotlin.Any declared in <root>'
+        BLOCK type=kotlin.Any origin=WHEN
+          VAR IR_TEMPORARY_VARIABLE name:tmp_0 type:kotlin.Any [val]
+            GET_VAR '<this>: kotlin.Any declared in <root>.copyValueIfNeeded' type=kotlin.Any origin=null
+          WHEN type=kotlin.Any origin=WHEN
+            BRANCH
+              if: TYPE_OP type=kotlin.Boolean origin=INSTANCEOF typeOperand=kotlin.Array<*>
+                GET_VAR 'val tmp_0: kotlin.Any [val] declared in <root>.copyValueIfNeeded' type=kotlin.Any origin=null
+              then: CALL 'public final fun apply <T> (block: @[ExtensionFunctionType] @[ExtensionFunctionType] kotlin.Function1<T of kotlin.apply, kotlin.Unit>): T of kotlin.apply [inline] declared in kotlin' type=kotlin.Any? origin=null
+                <T>: kotlin.Any?
+                $receiver: CALL 'public open fun newInstance (p0: java.lang.Class<*>?, p1: kotlin.Int): kotlin.Any? declared in java.lang.reflect.Array' type=kotlin.Any? origin=null
+                  p0: CALL 'public open fun getComponentType (): java.lang.Class<*>? declared in java.lang.Class' type=java.lang.Class<*>? origin=GET_PROPERTY
+                    $this: CALL 'public final fun <get-java> <T> (): java.lang.Class<T of kotlin.jvm.<get-java>> declared in kotlin.jvm' type=java.lang.Class<kotlin.Array<*>> origin=GET_PROPERTY
+                      <T>: kotlin.Array<*>
+                      $receiver: GET_CLASS type=kotlin.reflect.KClass<kotlin.Array<*>>
+                        GET_VAR '<this>: kotlin.Any declared in <root>.copyValueIfNeeded' type=kotlin.Array<*> origin=null
+                  p1: CALL 'public final fun <get-size> (): kotlin.Int declared in kotlin.Array' type=kotlin.Int origin=GET_PROPERTY
+                    $this: TYPE_OP type=kotlin.Array<*> origin=IMPLICIT_CAST typeOperand=kotlin.Array<*>
+                      GET_VAR '<this>: kotlin.Any declared in <root>.copyValueIfNeeded' type=kotlin.Any origin=null
+                block: FUN_EXPR type=kotlin.Function1<kotlin.Any?, kotlin.Unit> origin=LAMBDA
+                  FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($receiver:kotlin.Any?) returnType:kotlin.Unit
+                    $receiver: VALUE_PARAMETER name:<this> type:kotlin.Any?
+                    BLOCK_BODY
+                      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+                        TYPE_OP type=kotlin.Array<kotlin.Any?> origin=CAST typeOperand=kotlin.Array<kotlin.Any?>
+                          GET_VAR '<this>: kotlin.Any? declared in <root>.copyValueIfNeeded.<anonymous>' type=kotlin.Any? origin=null
+                      CALL 'public final fun forEachIndexed <T> (action: kotlin.Function2<kotlin.Int, T of kotlin.collections.forEachIndexed, kotlin.Unit>): kotlin.Unit [inline] declared in kotlin.collections' type=kotlin.Unit origin=null
+                        <T>: kotlin.Any?
+                        $receiver: TYPE_OP type=kotlin.Array<kotlin.Any?> origin=CAST typeOperand=kotlin.Array<kotlin.Any?>
+                          GET_VAR '<this>: kotlin.Any declared in <root>.copyValueIfNeeded' type=kotlin.Array<*> origin=null
+                        action: FUN_EXPR type=kotlin.Function2<kotlin.Int, kotlin.Any?, kotlin.Unit> origin=LAMBDA
+                          FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (i:kotlin.Int, value:kotlin.Any?) returnType:kotlin.Unit
+                            VALUE_PARAMETER name:i index:0 type:kotlin.Int
+                            VALUE_PARAMETER name:value index:1 type:kotlin.Any?
+                            BLOCK_BODY
+                              CALL 'public final fun set (index: kotlin.Int, value: T of kotlin.Array): kotlin.Unit [operator] declared in kotlin.Array' type=kotlin.Unit origin=null
+                                $this: GET_VAR '<this>: kotlin.Any? declared in <root>.copyValueIfNeeded.<anonymous>' type=kotlin.Array<kotlin.Any?> origin=null
+                                index: GET_VAR 'i: kotlin.Int declared in <root>.copyValueIfNeeded.<anonymous>.<anonymous>' type=kotlin.Int origin=null
+                                value: BLOCK type=kotlin.Any? origin=SAFE_CALL
+                                  VAR IR_TEMPORARY_VARIABLE name:tmp_1 type:kotlin.Any? [val]
+                                    GET_VAR 'value: kotlin.Any? declared in <root>.copyValueIfNeeded.<anonymous>.<anonymous>' type=kotlin.Any? origin=null
+                                  WHEN type=kotlin.Any? origin=null
+                                    BRANCH
+                                      if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                                        arg0: GET_VAR 'val tmp_1: kotlin.Any? [val] declared in <root>.copyValueIfNeeded.<anonymous>.<anonymous>' type=kotlin.Any? origin=null
+                                        arg1: CONST Null type=kotlin.Nothing? value=null
+                                      then: CONST Null type=kotlin.Nothing? value=null
+                                    BRANCH
+                                      if: CONST Boolean type=kotlin.Boolean value=true
+                                      then: CALL 'public final fun copyValueIfNeeded (): kotlin.Any declared in <root>' type=kotlin.Any origin=null
+                                        $receiver: GET_VAR 'val tmp_1: kotlin.Any? [val] declared in <root>.copyValueIfNeeded.<anonymous>.<anonymous>' type=kotlin.Any? origin=null
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: GET_VAR '<this>: kotlin.Any declared in <root>.copyValueIfNeeded' type=kotlin.Any origin=null
+  FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
+    BLOCK_BODY
+      VAR name:res type:kotlin.Array<kotlin.String> [val]
+        TYPE_OP type=kotlin.Array<kotlin.String> origin=CAST typeOperand=kotlin.Array<kotlin.String>
+          CALL 'public final fun copyValueIfNeeded (): kotlin.Any declared in <root>' type=kotlin.Any origin=null
+            $receiver: CALL 'public final fun arrayOf <T> (vararg elements: T of kotlin.arrayOf): kotlin.Array<T of kotlin.arrayOf> [inline] declared in kotlin' type=kotlin.Array<kotlin.String> origin=null
+              <T>: kotlin.String
+              elements: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
+                CONST String type=kotlin.String value="FAIL"
+                CONST String type=kotlin.String value="OK"
+      RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in <root>'
+        CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.String origin=null
+          $this: GET_VAR 'val res: kotlin.Array<kotlin.String> [val] declared in <root>.box' type=kotlin.Array<kotlin.String> origin=null
+          index: CONST Int type=kotlin.Int value=1
