@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 class FirClassSubstitutionScope(
     private val session: FirSession,
@@ -521,7 +522,7 @@ class FirClassSubstitutionScope(
             }
             val copiedReturnType = newReturnType?.let {
                 substitutor.substituteOrNull(it)
-            } ?: baseCallable.returnTypeRef.let {
+            } ?: baseCallable.returnTypeRef.safeAs<FirResolvedTypeRef>()?.let {
                 substitutor.substituteOrNull(it.coneType)
             }
             return copiedReceiverType to copiedReturnType
